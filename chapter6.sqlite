@@ -1,0 +1,14 @@
+/* DO NOT REMOVE*/
+.mode box
+.echo on
+
+/* shows all tables */
+.tables
+
+/* Show all records from any three of the tables listed above. We'll use these tables in next week's exercises. */
+
+select * from department;
+
+
+/* DO NOT REMOVE*/
+.exit 
