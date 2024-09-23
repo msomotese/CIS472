@@ -1,0 +1,115 @@
+/* DO NOT REMOVE*/
+.mode box
+.echo on
+.tables
+
+/* VIEW TABLE SCHEMAS */
+.schema student
+.schema instructor
+.schema department
+
+
+/* VIEW DATA */
+select * from student;
+select * from instructor;
+select * from department;
+select * from section;
+select * from classroom;
+select * from takes;
+select * from teaches;
+select * from grade_points;
+
+/* Find the titles of courses in the Comp. Sci. department that have 3 credits */
+
+Select title from course where dept_name = 'Comp. Sci.' and credits =3;
+
+/* Find the IDs of all students who were taught by an instructor named Einstein; make sure there are no duplicates in the result. */
+
+Select distinct student.ID from student, teaches, instructor where instructor.name ='Einstein' and teaches.ID = instructor.ID;
+
+/* Find the highest salary of any instructor. */
+Select MAX(salary), name From instructor;
+
+/* Find all instructors earning the highest salary (there may be more than one with the same salary). */
+select * from instructor where salary = (Select max(salary) from instructor);
+
+/* Find the enrollment of each section that was offered in Fall 2017. */
+select section.sec_id, count(*) as enrollment from section left join takes ON section.course_id = takes.course_id AND section.semester = 'Fall' AND section.year = 2017
+GROUP BY section.sec_id;
+
+/* Find the maximum enrollment, across all sections, in Fall 2017. */
+SELECT MAX(enrollment) AS max_enrollment
+FROM (
+    SELECT COUNT(takes.ID) AS enrollment
+    FROM section 
+    LEFT JOIN takes ON section.course_id = takes.course_id
+    WHERE section.semester = 'Fall' AND section.year = 2017
+    GROUP BY section.sec_id
+) AS enrollments;
+
+/* Find the sections that had the maximum enrollment in Fall 2017. */
+
+SELECT section.sec_id, COUNT(takes.ID) AS enrollment
+FROM section
+LEFT JOIN takes ON section.course_id = takes.course_id
+WHERE section.semester = 'Fall' AND section.year = 2017
+GROUP BY section.sec_id
+HAVING COUNT(takes.ID) = (
+    SELECT MAX(enrollment)
+    FROM (
+        SELECT COUNT(takes.ID) AS enrollment
+        FROM section
+        LEFT JOIN takes ON section.course_id = takes.course_id
+        WHERE section.semester = 'Fall' AND section.year = 2017
+        GROUP BY section.sec_id
+    ) AS enrollments
+);
+
+/* Find the total grade points earned by the student with ID '12345', across all courses taken by the student. */
+
+select sum(course.credits * grade_points.points) as total_gp from takes join course on takes.course_id = course.course_id join grade_points on takes.grade = grade_points.grade where 
+takes.ID = '12345';
+
+/* Find the grade point average (GPA) for the above student, that is, the total grade points divided by the total credits for the associated courses. */
+
+SELECT SUM(course.credits * grade_points.points) / SUM(course.credits) AS gpa
+FROM takes
+JOIN course ON takes.course_id = course.course_id
+JOIN grade_points ON takes.grade = grade_points.grade
+WHERE takes.ID = '12345';
+
+/* Find the ID and the grade-point average of each student. */
+
+select takes.ID, 
+    SUM(course.credits * grade_points.points) / SUM(course.credits) AS gpa
+FROM takes takes
+JOIN course ON takes.course_id = course.course_id
+JOIN grade_points ON takes.grade = grade_points.grade
+GROUP BY takes.ID;
+
+/* Increase the salary of each instructor in the Comp. Sci. department by 10%. */
+
+UPDATE instructor
+SET salary = salary * 1.10
+WHERE dept_name = 'Comp. Sci.';
+
+
+/* Delete all courses that have never been offered (i.e., do not occur in the section relation). */
+
+DELETE FROM course
+WHERE course_id NOT IN (
+    SELECT DISTINCT course_id
+    FROM section
+);
+
+
+/* Insert every student whose tot_cred attribute is greater than 100 as an instructor in the same department, with a salary of $100,000. */
+
+INSERT INTO instructor
+SELECT ID, name, dept_name, 100000
+FROM student 
+WHERE dept_name = 'Comp. Sci.' and student.tot_cred > 100;
+
+
+/* DO NOT REMOVE*/
+.exit 
