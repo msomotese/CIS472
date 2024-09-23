@@ -1,0 +1,13 @@
+/* DO NOT REMOVE*/
+.mode box
+.echo on
+
+/* VIEW TABLE SCHEMAS */
+.schema student
+
+/* Show all records from the student table */
+
+select * from student;
+
+/* DO NOT REMOVE*/
+.exit 
