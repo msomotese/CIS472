@@ -1,0 +1,29 @@
+#chapter5
+
+pipeline:
+  grade_chapter5_sql_function:
+    image: uiscsc472/mysql-python3-java:latest
+    commands:
+        - sleep 20
+        - mysql -t -v -u root -h database < chapter5/chapter5.sql
+          
+  grade_chapter5_java_access:
+    image: uiscsc472/mysql-python3-java:latest
+    environment:
+        - CLASSPATH=.:/usr/share/java/mysql-connector-j-8.1.0.jar
+    commands:
+        - cd chapter5
+        - javac chapter5.java
+        - java chapter5
+        
+  grade_chapter5_python_access:
+    image: uiscsc472/mysql-python3-java:latest
+    commands:
+        - pip3 install mysql-connector-python --quiet
+        - python3 chapter5/chapter5.py
+                   
+services:
+  database:
+    image: uiscsc472/mysql-python3-java:latest
+    environment:
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
