@@ -1,0 +1,12 @@
+pipeline:
+  grade_chapter10:
+    image: mongo:3.2.9
+    commands:
+        - mongoimport --host mongodb --db chapter10 --collection restaurants --file chapter10/restaurants.json
+        - mongo --host mongodb < chapter10/chapter10.js 
+
+services:
+  mongodb:
+    image: mongo:3.2.9
+    command: [ --smallfiles ]
+FooterUniversity of Illinois Springfield
