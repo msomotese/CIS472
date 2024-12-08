@@ -1,0 +1,20 @@
+pipeline:
+  grade_chapter15:
+    image: uiscsc472/postgres
+    environment:
+        - PGPASSWORD=p@ssw0rd
+    commands:
+        - |
+          until psql -U postgres -d chapter15 -h postgres \
+            -c "SELECT 1;" >/dev/null 2>&1; do sleep 1; done
+        - |
+          psql -U postgres -d chapter15 -h postgres \
+            -a -v ON_ERROR_STOP=1 -f chapter15/chapter15.sql
+services:
+  postgres:
+    image: uiscsc472/postgres
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=p@ssw0rd
+        - POSTGRES_DB=chapter15
+FooterUniversity of Illinois Springfield
