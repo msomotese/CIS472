@@ -1,0 +1,47 @@
+--Show the time the query takes
+\timing on
+
+--Describe the customers table
+\d+ customers
+
+--Describe the orders table
+\d+ orders
+
+--Describe the order_details table
+\d+ order_details
+
+--DO NOT TOUCH ANYTHING ABOVE THIS LINE
+
+
+
+--1 Create a materialized view of the Northwind database
+CREATE MATERIALIZED VIEW customer_discounts
+AS
+ SELECT c.contact_name AS customer,
+    o.order_id, d.discount, d.quantity
+   FROM ((customers c
+     JOIN orders o ON ((c.customer_id = o.customer_id)))
+     JOIN order_details d ON ((o.order_id = d.order_id)))
+   ORDER BY c.contact_name DESC, d.discount DESC
+WITH NO DATA;
+
+
+--2 Refresh the materialized view
+REFRESH MATERIALIZED VIEW customer_discounts;
+
+--3 Create a view of the Northwind database
+CREATE VIEW customer_discounts_live
+AS
+ SELECT c.contact_name AS customer,
+  o.order_id, d.discount, d.quantity
+ FROM ((customers c
+     JOIN orders o ON ((c.customer_id = o.customer_id)))
+     JOIN order_details d ON ((o.order_id = d.order_id)))
+   ORDER BY c.contact_name DESC, d.discount DESC;
+
+
+--4 Select 10 records from the materialized view and look at the time of execution
+SELECT * FROM customer_discounts limit 10;
+
+--5 Select 10 records from the view and look at the time of execution
+SELECT * FROM customer_discounts_live limit 10;
